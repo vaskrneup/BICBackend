@@ -13,6 +13,13 @@ REPLIES = {
     "hello": "hi",
     "when are you available": "Tomorrow at noon"
 }
+message_data = [
+    {
+        "message_text": "Hello",
+        "sender": "Ramesh",
+        "sent_date": "2021/11/19 11:21:32"
+    },
+]
 
 
 def create_json_from_request_data(request):
@@ -41,24 +48,18 @@ def stock_data(request):
 def messenger_bot(request):
     if request.method == "POST":
         json_data = create_json_from_request_data(request)
+        message_data.append(json_data)
         message_text = json_data.get("message_text", "")
-        Message(
-            sender=json_data.get("sender"), sent_date=json_data.get("sent_date"),
-            message_text=message_text
-        ).save()
 
         if message_text in REPLIES:
-            Message(
-                sender=json_data.get("sender"), sent_date=json_data.get("sent_date"),
-                message_text=message_text
-            ).save()
             reply_msg = REPLIES[message_text]
         else:
             reply_msg = "Sorry, I am busy right now. I will call you later."
 
-        Message(
-            sender="Bot Bahadur", sent_date=datetime.datetime.now,
-            message_text=reply_msg
-        ).save()
+        message_data.append({
+            "sender": "Bot Bahadur",
+            "message_text": reply_msg,
+            "sent_date": "2021/11/19 11:21:32"
+        })
 
     return JsonResponse({"messages": json.loads(serializers.serialize("json", Message.objects.all()))})
