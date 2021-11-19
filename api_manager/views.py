@@ -3,6 +3,7 @@ import datetime
 from django.core import serializers
 from django.http import JsonResponse
 import json
+import secrets
 
 from django.views.decorators.csrf import csrf_exempt
 
@@ -15,6 +16,7 @@ REPLIES = {
 }
 message_data = [
     {
+        "pk": str(secrets.token_hex(16)),
         "message_text": "Hello",
         "sender": "Ramesh",
         "sent_date": "2021/11/19 11:21:32"
@@ -57,9 +59,10 @@ def messenger_bot(request):
             reply_msg = "Sorry, I am busy right now. I will call you later."
 
         message_data.append({
+            "pk": str(secrets.token_hex(16)),
             "sender": "Bot Bahadur",
             "message_text": reply_msg,
             "sent_date": "2021/11/19 11:21:32"
         })
 
-    return JsonResponse({"messages": json.loads(serializers.serialize("json", Message.objects.all()))})
+    return JsonResponse({"messages": message_data})
