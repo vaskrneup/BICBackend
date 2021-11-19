@@ -10,6 +10,7 @@ from api_manager.models import Message, Stock
 
 REPLIES = {
     "hi": "hello",
+    "hello": "hi",
     "when are you available": "Tomorrow at noon"
 }
 
@@ -45,24 +46,19 @@ def messenger_bot(request):
             sender=json_data.get("sender"), sent_date=json_data.get("sent_date"),
             message_text=message_text
         ).save()
-        if message_text.startswith("#help"):
-            if message_text := message_text.replace("#help", "").strip():
-                if message_text in REPLIES:
-                    Message(
-                        sender=json_data.get("sender"), sent_date=json_data.get("sent_date"),
-                        message_text=message_text
-                    ).save()
-                    reply_msg = REPLIES[message_text]
-                else:
-                    Message(
-                        sender="Bot Bahadur", sent_date=datetime.datetime.now,
-                        message_text=REPLIES[message_text]
-                    ).save()
-                    reply_msg = "Sorry, I am busy right now. I will call you later."
 
-                Message(
-                    sender="Bot Bahadur", sent_date=datetime.datetime.now,
-                    message_text=reply_msg
-                ).save()
+        if message_text in REPLIES:
+            Message(
+                sender=json_data.get("sender"), sent_date=json_data.get("sent_date"),
+                message_text=message_text
+            ).save()
+            reply_msg = REPLIES[message_text]
+        else:
+            reply_msg = "Sorry, I am busy right now. I will call you later."
+
+        Message(
+            sender="Bot Bahadur", sent_date=datetime.datetime.now,
+            message_text=reply_msg
+        ).save()
 
     return JsonResponse({"messages": json.loads(serializers.serialize("json", Message.objects.all()))})
